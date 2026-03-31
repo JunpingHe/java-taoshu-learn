@@ -1,0 +1,195 @@
+### 淘书网API测试文件
+### 使用IDEA HTTP Client测试
+### 基础URL
+@baseUrl = http://localhost:8083
+
+### ==========================================
+### 用户模块测试
+### ==========================================
+
+### 1. 注册用户
+POST {{baseUrl}}/api/user/register
+Content-Type: application/json
+
+{
+  "phone": "13800138000",
+  "password": "123456",
+  "nickname": "小王"
+}
+
+### 2. 用户登录
+# @name login
+POST {{baseUrl}}/api/user/login
+Content-Type: application/json
+
+{
+  "phone": "13800138000",
+  "password": "123456"
+}
+
+### 从登录响应中提取token(手动复制或使用如下方式)
+### 在IDEA中,登录后可以在响应中看到token,复制到下方
+
+### 3. 获取用户信息(需要token)
+GET {{baseUrl}}/api/user/info
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInBob25lIjoiMTM4MDAxMzgwMDAiLCJzdWIiOiIxIiwiaWF0IjoxNzEwNzY4ODg5LCJleHAiOjE3MTA4NTUyODl9.xxxxx
+
+### ==========================================
+### 商品模块测试
+### ==========================================
+
+### 4. 创建商品(需要token,先登录获取token)
+POST {{baseUrl}}/api/book
+Authorization: Bearer YOUR_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "title": "Java编程思想",
+  "author": "Bruce Eckel",
+  "publisher": "机械工业出版社",
+  "isbn": "9787111213826",
+  "price": 88.00,
+  "stock": 10,
+  "description": "Java经典书籍,适合初学者和进阶者"
+}
+
+### 5. 创建第二本商品
+POST {{baseUrl}}/api/book
+Authorization: Bearer YOUR_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "title": "Spring Boot实战",
+  "author": "Craig Walls",
+  "publisher": "人民邮电出版社",
+  "price": 79.00,
+  "stock": 15,
+  "description": "Spring Boot入门经典"
+}
+
+### 6. 查询商品列表(公开,无需token)
+GET {{baseUrl}}/api/book/list?page=0&size=10
+
+### 7. 搜索商品(公开)
+GET {{baseUrl}}/api/book/search?keyword=Java&page=0&size=10
+
+### 8. 查询商品详情(公开)
+GET {{baseUrl}}/api/book/1
+
+### 9. 更新商品(需要token,只能更新自己的商品)
+PUT {{baseUrl}}/api/book/1
+Authorization: Bearer YOUR_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "price": 78.00,
+  "stock": 20
+}
+
+### 10. 查询我的商品(需要token)
+GET {{baseUrl}}/api/book/my
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### 11. 删除商品(需要token,只能删除自己的商品)
+DELETE {{baseUrl}}/api/book/1
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### ==========================================
+### 测试异常情况
+### ==========================================
+
+### 12. 测试: 手机号格式错误
+POST {{baseUrl}}/api/user/register
+Content-Type: application/json
+
+{
+  "phone": "123",
+  "password": "123456"
+}
+
+### 13. 测试: 密码太短
+POST {{baseUrl}}/api/user/register
+Content-Type: application/json
+
+{
+  "phone": "13900139000",
+  "password": "123"
+}
+
+### 14. 测试: 重复注册
+POST {{baseUrl}}/api/user/register
+Content-Type: application/json
+
+{
+  "phone": "13800138000",
+  "password": "123456"
+}
+
+### 15. 测试: 错误的密码登录
+POST {{baseUrl}}/api/user/login
+Content-Type: application/json
+
+{
+  "phone": "13800138000",
+  "password": "wrongpassword"
+}
+
+### 16. 测试: 无token访问需要认证的接口
+GET {{baseUrl}}/api/user/info
+
+### 17. 测试: 无效token
+GET {{baseUrl}}/api/user/info
+Authorization: Bearer invalid_token
+
+### ==========================================
+### 完整测试流程
+### ==========================================
+
+### 步骤1: 注册新用户
+POST {{baseUrl}}/api/user/register
+Content-Type: application/json
+
+{
+  "phone": "13900139999",
+  "password": "test123",
+  "nickname": "测试用户"
+}
+
+### 步骤2: 登录并获取token
+# @name testLogin
+POST {{baseUrl}}/api/user/login
+Content-Type: application/json
+
+{
+  "phone": "13900139999",
+  "password": "test123"
+}
+
+### 步骤3: 使用token创建商品(需要手动复制token)
+POST {{baseUrl}}/api/book
+Authorization: Bearer YOUR_TOKEN_FROM_STEP2
+Content-Type: application/json
+
+{
+  "title": "算法导论",
+  "author": "Thomas H. Cormen",
+  "price": 128.00,
+  "stock": 5
+}
+
+### 步骤4: 查询商品列表
+GET {{baseUrl}}/api/book/list?page=0&size=10
+
+### ==========================================
+### H2数据库查询
+### ==========================================
+
+### 注意: H2控制台需要浏览器访问
+### 访问地址: http://localhost:8083/h2-console
+### JDBC URL: jdbc:h2:mem:taoshu-db
+### User: sa
+### Password: (空)
+
+### SQL查询示例:
+-- SELECT * FROM user;
+-- SELECT * FROM book;

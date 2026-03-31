@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: taoshu-learn
+  
+  # H2 数据库配置
+  datasource:
+    url: jdbc:h2:mem:taoshu-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  # JPA 配置
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  
+  # H2 控制台配置（开发环境使用）
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
+# JWT配置
+jwt:
+  secret: taoshu-secret-key-change-in-production-must-be-at-least-256-bits
+  expiration: 86400000  # 24小时(毫秒)
+
+server:
+  port: 8083
+
+logging:
+  level:
+    org.example: DEBUG
+    org.springframework.web: INFO
